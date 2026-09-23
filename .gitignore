@@ -1,0 +1,8 @@
+*.db
+*.db.*
+__pycache__/
+*.pyc
+debug_ajax.json
+debug_courses.html
+state.json
+*.bak
