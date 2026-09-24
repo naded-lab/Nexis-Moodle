@@ -309,6 +309,7 @@ async def telegram(env, method, payload):
     if not token: raise RuntimeError("TELEGRAM_BOT_TOKEN is required")
     resp = await fetch(f"https://api.telegram.org/bot{token}/{method}", {"method": "POST", "headers": {"Content-Type": "application/json"}, "body": json.dumps(payload)})
     data = await resp.json()
+    if not resp.ok: raise RuntimeError(f"Telegram HTTP {resp.status}: {data}")
     if not data.get("ok"): raise RuntimeError(data.get("description", f"Telegram API error: {method}"))
     return data.get("result")
 
