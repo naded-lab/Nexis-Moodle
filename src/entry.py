@@ -384,16 +384,13 @@ class Default(WorkerEntrypoint):
         supplied = request.headers.get("X-Telegram-Bot-Api-Secret-Token")
         if secret and supplied != secret: return Response("Unauthorized", status=401)
         try:
-            await handle_update(self.env, await request.json())
+            update = await request.json()
+            await handle_update(self.env, update)
             return Response("ok")
         except Exception as exc:
             print(f"Webhook error type={type(exc).__name__} message={exc}")
-            try:
-                body = await request.json()
-                if body.get("update_id") == 888888:
-                    return Response(f"DIAGNOSTIC: {type(exc).__name__}: {exc}", status=500)
-            except Exception:
-                pass
+            if "update" in locals() and update.get("update_id") == 888888:
+                return Response(f"DIAGNOSTIC: {type(exc).__name__}: {exc}", status=500)
             return Response("error", status=500)
 
     async def scheduled(self, controller, env, ctx):
