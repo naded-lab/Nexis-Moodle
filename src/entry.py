@@ -149,7 +149,13 @@ class MoodleSession:
             elif current_json is not None:
                 options["body"] = json.dumps(current_json)
                 req_headers["Content-Type"] = "application/json"
-            response = await fetch(current_url, options)
+            response = await fetch(Request(
+                current_url,
+                method=current_method,
+                headers=req_headers,
+                body=options.get("body"),
+                redirect="manual",
+            ))
             self.update_cookies(response)
             status = int(response.status)
             if status in (301, 302, 303, 307, 308):
