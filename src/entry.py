@@ -6,7 +6,7 @@ from urllib.parse import urlencode
 
 from bs4 import BeautifulSoup
 from cryptography.fernet import Fernet, InvalidToken
-from workers import WorkerEntrypoint, Response, fetch
+from workers import Request, WorkerEntrypoint, Response, fetch
 
 BASE_URL = "https://moodle.alaqsa.edu.ps"
 LOGIN_URL = f"{BASE_URL}/login/index.php"
