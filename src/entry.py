@@ -386,7 +386,7 @@ class Default(WorkerEntrypoint):
             await handle_update(self.env, await request.json())
             return Response("ok")
         except Exception as exc:
-            print(f"Webhook error: {exc}")
+            print(f"Webhook error type={type(exc).__name__} message={exc}")
             return Response("error", status=500)
 
     async def scheduled(self, controller, env, ctx):
