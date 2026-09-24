@@ -65,6 +65,20 @@ jobs:
           curl -fsS -o /tmp/worker_response -w "HTTP %{http_code}\n" -X POST "https://nexis-moodle.nadedashraf.workers.dev"             -H "Content-Type: application/json"             -H "X-Telegram-Bot-Api-Secret-Token: ${WEBHOOK_SECRET}"             -d '{"update_id":999999,"message":{"message_id":999999,"chat":{"id":999999,"type":"private"},"from":{"id":999999},"text":"health-check"}}'
           cat /tmp/worker_response
 
+      - name: Capture Worker runtime error
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
+        run: |
+          timeout 30s npx wrangler tail nexis-moodle --format json > /tmp/worker-tail.log 2>&1 &
+          TAIL_PID=$!
+          sleep 5
+          curl -sS -X POST "https://nexis-moodle.nadedashraf.workers.dev"             -H "Content-Type: application/json"             -H "X-Telegram-Bot-Api-Secret-Token: ${WEBHOOK_SECRET}"             -d '{"update_id":888888,"message":{"message_id":888888,"chat":{"id":999999,"type":"private"},"from":{"id":999999},"text":"/start"}}'             || true
+          sleep 5
+          kill $TAIL_PID 2>/dev/null || true
+          cat /tmp/worker-tail.log || true
+
       - name: Apply D1 schema
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
