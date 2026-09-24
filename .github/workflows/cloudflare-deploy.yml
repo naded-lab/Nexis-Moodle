@@ -16,16 +16,21 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: astral-sh/setup-uv@v7
+
       - name: Install Python Worker tooling
         run: uv sync
+
       - name: Deploy Worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: uv run pywrangler deploy
+
       - name: Set Worker secrets
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -34,9 +39,19 @@ jobs:
           NEXIS_MASTER_KEY: ${{ secrets.NEXIS_MASTER_KEY }}
           WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
         run: |
-          printf "%s" "" | npx wrangler secret put TELEGRAM_BOT_TOKEN
-          printf "%s" "" | npx wrangler secret put NEXIS_MASTER_KEY
-          printf "%s" "" | npx wrangler secret put WEBHOOK_SECRET
+          printf "%s" "$TELEGRAM_BOT_TOKEN" | npx wrangler secret put TELEGRAM_BOT_TOKEN
+          printf "%s" "$NEXIS_MASTER_KEY" | npx wrangler secret put NEXIS_MASTER_KEY
+          printf "%s" "$WEBHOOK_SECRET" | npx wrangler secret put WEBHOOK_SECRET
+
+      - name: Set Telegram webhook
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
+        run: |
+          curl -fsS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook" \
+            -d "url=https://nexis-moodle.nadedashraf.workers.dev" \
+            -d "secret_token=${WEBHOOK_SECRET}"
+
       - name: Apply D1 schema
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
