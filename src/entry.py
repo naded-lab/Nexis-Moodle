@@ -173,7 +173,12 @@ class MoodleSession:
 async def get_login_token(session):
     resp = await session.request("GET", LOGIN_URL)
     if int(resp.status) >= 400:
-        raise RuntimeError(f"Moodle returned HTTP {resp.status}")
+        body = (await resp.text())[:1000]
+        cf_ray = resp.headers.get("cf-ray", "")
+        server = resp.headers.get("server", "")
+        raise RuntimeError(
+            f"Moodle GET HTTP {resp.status} | server={server} | cf-ray={cf_ray} | body={body}"
+        )
     soup = BeautifulSoup(await resp.text(), "html.parser")
     token_input = soup.find("input", {"name": "logintoken"})
     if not token_input:
