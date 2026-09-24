@@ -52,6 +52,12 @@ jobs:
             -d "url=https://nexis-moodle.nadedashraf.workers.dev" \
             -d "secret_token=${WEBHOOK_SECRET}"
 
+      - name: Verify Telegram webhook
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          curl -fsS "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getWebhookInfo" | jq '{ok, result: {url, pending_update_count, last_error_message, last_error_date}}'
+
       - name: Apply D1 schema
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
