@@ -116,7 +116,7 @@ def short_date(text):
 class MoodleSession:
     def __init__(self):
         self.cookies = {}
-        self.user_agent = "Mozilla/5.0 (Nexis Moodle Bot)"
+        self.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
 
     def cookie_header(self):
         return "; ".join(f"{k}={v}" for k, v in self.cookies.items())
