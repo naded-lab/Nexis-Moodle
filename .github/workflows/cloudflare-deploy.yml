@@ -56,13 +56,13 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: |
-          curl -fsS "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getWebhookInfo" | jq '{ok, result: {url, pending_update_count, last_error_message, last_error_date}}'
+          curl -fsS "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getWebhookInfo" | jq '{ok, result: {url: .result.url, pending_update_count: .result.pending_update_count, last_error_message: .result.last_error_message, last_error_date: .result.last_error_date}}'
 
       - name: Test Worker webhook
         env:
           WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
         run: |
-          curl -fsS -o /tmp/worker_response -w "HTTP %{http_code}\n" -X POST "https://nexis-moodle.nadedashraf.workers.dev"             -H "Content-Type: application/json"             -H "X-Telegram-Bot-Api-Secret-Token: ${WEBHOOK_SECRET}"             -d '{"update_id":999999,"message":{"message_id":999999,"chat":{"id":999999,"type":"private"},"from":{"id":999999},"text":"/start"}}'
+          curl -fsS -o /tmp/worker_response -w "HTTP %{http_code}\n" -X POST "https://nexis-moodle.nadedashraf.workers.dev"             -H "Content-Type: application/json"             -H "X-Telegram-Bot-Api-Secret-Token: ${WEBHOOK_SECRET}"             -d '{"update_id":999999,"message":{"message_id":999999,"chat":{"id":999999,"type":"private"},"from":{"id":999999},"text":"health-check"}}'
           cat /tmp/worker_response
 
       - name: Apply D1 schema
