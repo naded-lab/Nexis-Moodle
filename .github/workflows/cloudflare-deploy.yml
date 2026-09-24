@@ -74,7 +74,7 @@ jobs:
           timeout 30s npx wrangler tail nexis-moodle --format json > /tmp/worker-tail.log 2>&1 &
           TAIL_PID=$!
           sleep 5
-          curl -sS -X POST "https://nexis-moodle.nadedashraf.workers.dev"             -H "Content-Type: application/json"             -H "X-Telegram-Bot-Api-Secret-Token: ${WEBHOOK_SECRET}"             -d '{"update_id":888888,"message":{"message_id":888888,"chat":{"id":999999,"type":"private"},"from":{"id":999999},"text":"/start"}}'             || true
+          curl -sS -w "\nHTTP %{http_code}\n" -X POST "https://nexis-moodle.nadedashraf.workers.dev"             -H "Content-Type: application/json"             -H "X-Telegram-Bot-Api-Secret-Token: ${WEBHOOK_SECRET}"             -d '{"update_id":888888,"message":{"message_id":888888,"chat":{"id":999999,"type":"private"},"from":{"id":999999},"text":"/start"}}'             || true
           sleep 5
           kill $TAIL_PID 2>/dev/null || true
           cat /tmp/worker-tail.log || true
