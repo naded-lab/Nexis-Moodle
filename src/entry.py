@@ -185,7 +185,8 @@ async def login(session, username, password):
     token = await get_login_token(session)
     resp = await session.request("POST", LOGIN_URL, form={"username": username, "password": password, "logintoken": token})
     if int(resp.status) >= 400:
-        raise RuntimeError(f"Moodle returned HTTP {resp.status}: {(await resp.text())[:500]}")
+        body = (await resp.text())[:500]
+        raise RuntimeError(f"Moodle POST HTTP {resp.status}: {body}")
     if "login/index.php" in str(resp.url):
         raise RuntimeError("فشل تسجيل الدخول — تأكد من اسم المستخدم وكلمة المرور.")
 
