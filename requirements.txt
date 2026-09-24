@@ -1,4 +1,0 @@
-python-telegram-bot[job-queue]>=21.0,<23
-requests>=2.31,<3
-beautifulsoup4>=4.12,<5
-cryptography>=42,<51
