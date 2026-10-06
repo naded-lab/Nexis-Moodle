@@ -121,7 +121,7 @@ def _user(uid):
     return _BACKEND.get_user(uid)
 
 
-def _overview(uid):
+def _overview(uid, fresh=False):
     row = _user(uid)
 
     if not row:
@@ -133,11 +133,70 @@ def _overview(uid):
             "fetched_at": int(time.time()),
         }
 
+    session = _BACKEND.get_moodle_session(uid, row, fresh=fresh)
+    courses = _BACKEND.get_courses(session, "inprogress")
+
+    out_courses = []
+    assignments = []
+    exams = []
+
+    for course_name, course_url in courses:
+        try:
+            ce, ca, materials, _week, extra = (
+                _BACKEND.get_activities_for_course(
+                    session, course_url
+                )
+            )
+        except Exception as exc:
+            _LOG.warning(
+                "web Moodle course failed: %s (%s)",
+                course_name,
+                type(exc).__name__,
+            )
+            out_courses.append({
+                "name": course_name,
+                "url": course_url,
+                "materials": 0,
+                "error": True,
+            })
+            continue
+
+        out_courses.append({
+            "name": course_name,
+            "url": course_url,
+            "materials": len(materials),
+        })
+
+        completion = extra.get("completion", {})
+
+        for item in ca:
+            name, opened, due, link = item
+            assignments.append({
+                "course": course_name,
+                "name": name,
+                "opened": opened,
+                "due": due,
+                "link": link,
+                "done": completion.get(link),
+            })
+
+        for item in ce:
+            name, opened, closed, *rest = item
+            link = rest[-1] if rest else None
+            exams.append({
+                "course": course_name,
+                "name": name,
+                "opened": opened,
+                "closed": closed,
+                "link": link,
+                "done": completion.get(link),
+            })
+
     return {
         "linked": True,
-        "courses": [],
-        "assignments": [],
-        "exams": [],
+        "courses": out_courses,
+        "assignments": assignments,
+        "exams": exams,
         "fetched_at": int(time.time()),
     }
 
@@ -376,7 +435,10 @@ class Handler(BaseHTTPRequestHandler):
 
             self.send_json(
                 200,
-                _overview(uid),
+                _overview(
+                    uid,
+                    fresh=query.get("fresh", ["0"])[0] == "1",
+                ),
             )
             return
 
