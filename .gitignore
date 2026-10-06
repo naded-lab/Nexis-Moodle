@@ -8,3 +8,5 @@ state.json
 *.bak
 nexis-android/
 Nexus Model Archive.zip
+
+secrets.env
