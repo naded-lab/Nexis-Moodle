@@ -17,7 +17,7 @@ export const Route = createFileRoute("/login")({
   component: Login,
 });
 
-const BOT = (import.meta.env['VITE_TELEGRAM_BOT_USERNAME'] as string | undefined) || 'NexisMBot';
+const BOT = "NexisMBot";
 
 function Login() {
   const ref = useRef<HTMLDivElement>(null);
