@@ -127,6 +127,7 @@ RETENTION_AI_USAGE_DAYS = 14
 
 DB_FILE = os.environ.get("NEXIS_DB_FILE", "nexis_moodle.db")
 BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+BOT_USERNAME = os.environ.get("TELEGRAM_BOT_USERNAME", "NexisMBot")
 MASTER_KEY = os.environ.get("NEXIS_MASTER_KEY", "")
 ASSIGNMENT_DAYS_AHEAD = _env_int("ASSIGNMENT_DAYS_AHEAD", 7)
 EXAM_DAYS_AHEAD = _env_int("EXAM_DAYS_AHEAD", 7)
