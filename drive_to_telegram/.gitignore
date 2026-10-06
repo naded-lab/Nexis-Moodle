@@ -1,0 +1,10 @@
+.venv/
+credentials.json
+token.json
+.env
+*.session
+*.session-journal
+migration.db
+*.log
+__pycache__/
+*.pyc
